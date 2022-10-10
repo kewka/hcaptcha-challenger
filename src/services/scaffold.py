@@ -33,6 +33,7 @@ class Scaffold:
 
     @staticmethod
     def demo(
+        url: str,
         silence: typing.Optional[bool] = False,
         model: typing.Optional[str] = None,
         target: typing.Optional[str] = None,
@@ -51,6 +52,7 @@ class Scaffold:
         or: python main.py demo --sitekey=[UUID]
         ——————————————————————————————————————————————————————————————————
 
+        :param url: Captcha URL.
         :param repeat: Default 5. Number of times to repeat the presentation.
         :param screenshot: Default False. Save screenshot of the challenge result.
             PATH: database/temp_cache/captcha_screenshot/
@@ -62,16 +64,8 @@ class Scaffold:
         :param target: Default None. Designate `Challenge Source`. See the global value SITE_KEYS.
         :return:
         """
-        # Generate challenge topics
-        if _SITE_KEYS.get(target):
-            sample_site = HCAPTCHA_DEMO_API.format(_SITE_KEYS[target])
-        else:
-            sample_site = HCAPTCHA_DEMO_SITES[0]
-        if sitekey is not None:
-            sample_site = HCAPTCHA_DEMO_API.format(sitekey.strip())
-
         challenge.runner(
-            sample_site,
+            url,
             lang=Scaffold.CHALLENGE_LANGUAGE,
             silence=silence,
             onnx_prefix=model,

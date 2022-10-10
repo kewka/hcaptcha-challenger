@@ -6,6 +6,7 @@
 import time
 import typing
 import warnings
+import sys
 
 from loguru import logger
 from selenium.common.exceptions import WebDriverException
@@ -77,6 +78,8 @@ def runner(
                     logger.warning("UnknownMistake")
                 elif resp == challenger.CHALLENGE_SUCCESS:
                     challenger.log(f"End of demo - total: {round(time.time() - start, 2)}s")
+                    print("CAPTCHA_RESPONSE: %s" % challenger.utils.get_hcaptcha_response(ctx))
+                    sys.exit()
                     logger.success(f"PASS[{i + 1}|{repeat}]".center(28, "="))
                 elif resp == challenger.CHALLENGE_RETRY:
                     ctx.refresh()
