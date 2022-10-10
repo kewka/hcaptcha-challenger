@@ -79,20 +79,20 @@ def get_challenge_ctx(silence: typing.Optional[bool] = None, lang: typing.Option
     # Control headless browser
     silence = True if silence is None or "linux" in sys.platform else silence
 
-    # - Restrict browser startup parameters
-    options = uc.ChromeOptions()
-    options.add_argument("--log-level=3")
-    options.add_argument("--disable-dev-shm-usage")
-
-    # - Restrict the language of hCaptcha label
-    # - Environment variables are valid only in the current process
-    # and do not affect other processes in the operating system
-    os.environ["LANGUAGE"] = "zh_CN" if lang is None else lang
-    options.add_argument(f"--lang={os.getenv('LANGUAGE')}")
-
-    if silence is True:
-        options.add_argument("--disable-gpu")
-        options.add_argument("--disable-software-rasterizer")
+    def get_chrome_options() -> uc.ChromeOptions:
+        # - Restrict browser startup parameters
+        options = uc.ChromeOptions()
+        options.add_argument("--log-level=3")
+        options.add_argument("--disable-dev-shm-usage")
+        # - Restrict the language of hCaptcha label
+        # - Environment variables are valid only in the current process
+        # and do not affect other processes in the operating system
+        os.environ["LANGUAGE"] = "zh_CN" if lang is None else lang
+        options.add_argument(f"--lang={os.getenv('LANGUAGE')}")
+        if silence is True:
+            options.add_argument("--disable-gpu")
+            options.add_argument("--disable-software-rasterizer")
+        return options
 
     # - Use chromedriver cache to improve application startup speed
     # - Requirement: undetected-chromedriver >= 3.1.5.post2
@@ -103,11 +103,11 @@ def get_challenge_ctx(silence: typing.Optional[bool] = None, lang: typing.Option
     logger.debug("🎮 Activate challenger context")
     try:
         return uc.Chrome(
-            options=options, headless=silence, driver_executable_path=driver_executable_path
+            options=get_chrome_options(), headless=silence, driver_executable_path=driver_executable_path
         )
     except WebDriverException:
         return uc.Chrome(
-            options=options,
+            options=get_chrome_options(),
             headless=silence,
             version_main=int(version_main) if version_main.isdigit() else None,
         )
